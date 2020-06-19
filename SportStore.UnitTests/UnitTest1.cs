@@ -32,7 +32,7 @@ namespace SportStore.UnitTests
             controller.PageSize = 3;
 
             //Act
-            ProductsListViewModel result = (ProductsListViewModel)controller.List(2).Model;
+            ProductsListViewModel result = (ProductsListViewModel)controller.List(null,2).Model;
             //Assert
             Product[] prodArray = result.Products.ToArray();
             Assert.IsTrue(prodArray.Length == 2);
@@ -60,12 +60,13 @@ namespace SportStore.UnitTests
             //Act
             MvcHtmlString result = myHelper.PageLinks(pagingInfo, pageUrlDelegate);
 
-            //Assert
-            Assert.AreEqual(@"<a class=""btn btn-default"" href=""Page1"">1</a>"
-                    + @"<a class=""btn btn-default btn-primary selected"" href=""Page2"">2</a>"
-                    + @"<a class=""btn btn-default"" href=""Page3"">3</a>",result.ToString());
-        }
 
+            //Assert
+            Assert.AreEqual(@"<ul class=""pagination""><li class=""page-item""><a class=""page-link"" href=""Page1"">1</a></li>"
+                    + @"<li class=""page-item active""><a class=""page-link"" href=""Page2"">2</a></li>"
+                    + @"<li class=""page-item""><a class=""page-link"" href=""Page3"">3</a></li></ul>", result.ToString());
+        }
+        
         [TestMethod]
         public void Can_Send_Pagination_View_Model()
         {
@@ -83,13 +84,40 @@ namespace SportStore.UnitTests
             controller.PageSize = 3;
 
             //Act
-            ProductsListViewModel result = (ProductsListViewModel)controller.List(2).Model;
+            ProductsListViewModel result = (ProductsListViewModel)controller.List(null,2).Model;
             //Assert
             PagingInfo pagingInfo = result.PagingInfo;
             Assert.AreEqual(pagingInfo.CurrentPage, 2);
             Assert.AreEqual(pagingInfo.ItemsPerPage, 3);
             Assert.AreEqual(pagingInfo.TotalItems, 5);
             Assert.AreEqual(pagingInfo.TotalPages, 2);
+        }
+
+        [TestMethod]
+        public void Can_Filter_Products()
+        {
+            //Arrange - create the mock repository
+            Mock<IProductRepository> mock = new Mock<IProductRepository>();
+            mock.Setup(m => m.Products).Returns(new Product[]
+            {
+                new Product {ProductID = 1, Name = "P1", Category = "Cat1"},
+                new Product {ProductID = 2, Name = "P2", Category = "Cat2"},
+                new Product {ProductID = 3, Name = "P3", Category = "Cat1"},
+                new Product {ProductID = 4, Name = "P4", Category = "Cat2"},
+                new Product {ProductID = 5, Name = "P5", Category = "Cat3"}
+            });
+
+            //Arrange - create a controller and make the page size 3 items
+            ProductController controller = new ProductController(mock.Object);
+            controller.PageSize = 3;
+
+            //Action
+            Product[] result = ((ProductsListViewModel)controller.List("Cat2", 1).Model).Products.ToArray();
+
+            //Assert
+            Assert.AreEqual(result.Length, 2);
+            Assert.IsTrue(result[0].Name == "P2" && result[0].Category == "Cat2");
+            Assert.IsTrue(result[1].Name == "P4" && result[1].Category == "Cat2");
         }
     }
 }
