@@ -1,0 +1,9 @@
+﻿@model SportStore.Domain.Entities.Product
+
+    <div class="card-body">
+        <h3 class="d-flex justify-content-between">
+            <strong>@Model.Name</strong>
+            <span class="badge badge-pill badge-primary">@Model.Price.ToString("c")</span>
+        </h3>
+        <span class="lead">@Model.Description</span>
+    </div>
