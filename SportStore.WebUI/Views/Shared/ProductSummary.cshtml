@@ -5,5 +5,17 @@
             <strong>@Model.Name</strong>
             <span class="badge badge-pill badge-primary">@Model.Price.ToString("c")</span>
         </h3>
-        <span class="lead">@Model.Description</span>
+
+        <div class="d-flex justify-content-between">
+            <span class="lead">@Model.Description</span>
+            @using (Html.BeginForm("AddToCart", "Cart"))
+            {
+                <div>
+                    @Html.HiddenFor(x => x.ProductID)
+                    @Html.Hidden("returnUrl", Request.Url.PathAndQuery)
+                    <input type="submit" class="btn btn-success" value="Add to Card" />
+                </div>
+            }
+        </div>
+        
     </div>
