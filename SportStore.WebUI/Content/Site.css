@@ -16,3 +16,7 @@ textarea {
     max-width: 280px;
 }
 
+
+.table tr:last-child td {
+    border-bottom: 1px solid #dee2e6;
+}
